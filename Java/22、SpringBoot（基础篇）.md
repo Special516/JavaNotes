@@ -1872,6 +1872,15 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
     - 自定义 json 数据并返回
 
+    ```yaml
+    spring:
+      mvc:
+        throw-exception-if-no-handler-found: true
+      web:
+        resources:
+          add-mappings: false
+    ```
+    
     ```java
     @ControllerAdvice
     public class MyExceptionHandler {
@@ -1880,7 +1889,7 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
         @ResponseBody
         @ExceptionHandler(UserNotExistException.class)
         public Map<String,Object> handleException(Exception e){
-            Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
             map.put("code","user.notexist");
             map.put("message",e.getMessage());
             return map;
@@ -1888,37 +1897,37 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
     }
     //没有自适应效果...
     ```
-    - 转发到 /error 进行自适应处理，能出现自适应效果，但不能携带自定义数据
-
+    - 转发到 `/error` 进行自适应处理，能出现自适应效果，但不能携带自定义数据
+    
     ```java
     @ExceptionHandler(UserNotExistException.class)
     public String handleException(Exception e, HttpServletRequest request){
         Map<String,Object> map = new HashMap<>();
         //传入我们自己的错误状态码  4xx 5xx，否则就不会进入定制错误页面的解析流程
         /**
-         * Integer statusCode=(Integer)request.getAttribute("javax.servlet.error.status_code");
+     * Integer statusCode=(Integer)request.getAttribute("javax.servlet.error.status_code");
          */
-        request.setAttribute("javax.servlet.error.status_code",500);
+    request.setAttribute("javax.servlet.error.status_code",500);
         map.put("code","user.notexist");
-        map.put("message",e.getMessage());
+    map.put("message",e.getMessage());
         //转发到/error
         return "forward:/error";
-    }
+}
     ```
-
+    
     - 将我们自定义的数据携带出去：
-
+    
         当应用程序出现错误以后，会来到 /error 请求，该请求会被 BasicErrorController 处理，响应出去可以获取的数据是由 `getErrorAttributes()` 得到的（是 AbstractErrorController 规定的方法）；
-
+    
         - 方法一： 完全编写一个 errorController 的实现类，放在容器中；或者编写 AbstractErrorController 的子类，只需要重写其中的方法即可。
         - 方法二： 页面或者 json 返回能用的数据都是通过 `errorAttributes.getErrorAttributes()` 方法得到的。SpringBoot 默认使用 `DefaultErrorAttributes` 来进行数据处理
-
+    
         ```java
         //给容器中加入我们自己定义的 ErrorAttributes
         @Component
         public class MyErrorAttributes extends DefaultErrorAttributes {
         
-            //返回的 map 就是页面和 json 能获取的所有字段
+        //返回的 map 就是页面和 json 能获取的所有字段
             @Override
             public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
                 Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
@@ -1927,7 +1936,7 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
             }
         }
         ```
-
+    
         最终的效果：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容。
 
 #### 8、配置嵌入式 Servlet 容器：

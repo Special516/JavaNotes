@@ -631,7 +631,7 @@ k1 ≤ x.key1 ≤ k2 x.key2 ≤ … ≤ x.keyx.n ≤ kx.n+1
 
 #### 4、explain 关键字
 
-SQL执行顺序：from -> on -> join -> where -> group by -> having -> select dinstinct -> order by -> limit
+SQL执行顺序：`from -> on -> join -> where -> group by -> having -> select dinstinct -> order by -> limit` 
 
 ```sql
 -- 查看sql语句执行计划
